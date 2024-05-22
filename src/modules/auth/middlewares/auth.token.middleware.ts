@@ -51,8 +51,8 @@ class AuthMiddleware {
       return next(new ApiError(StatusCodes.UNAUTHORIZED, AUTH_REQUIRED));
     }
     try {
-      const decoded = verifyToken(token, Env.get('CARDUVY_SECRET'));
-      req.data = decoded;
+      const decoded = verifyToken(token, Env.get('TODO_SECRET'));
+      // req.data = decoded;
       next();
     } catch (error) {
       return next(new ApiError(StatusCodes.UNAUTHORIZED, AUTH_REQUIRED));

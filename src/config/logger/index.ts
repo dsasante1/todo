@@ -134,5 +134,5 @@ class App_Logger {
   }
 }
 
-const Logger = App_Logger.createLogger({ label: 'CARDUVY_V1' });
+const Logger = App_Logger.createLogger({ label: 'TODO_V1' });
 export default Logger;

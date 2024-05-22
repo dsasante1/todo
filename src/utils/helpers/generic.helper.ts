@@ -123,7 +123,7 @@ export class GenericHelper {
   }
 
   static generateToken(data: object, expiresIn = '10m') {
-    return jwt.sign(data, `${Env.get('CARDUVY_SECRET')}`, {
+    return jwt.sign(data, `${Env.get('TODO_SECRET')}`, {
       expiresIn,
     });
   }
