@@ -1,0 +1,18 @@
+{
+    "development": {
+        "ENV": "TODO_DEV_DB_URL"
+    },
+    "staging": {
+        "ENV": "TODO_STAGING_DB_URL"
+    },
+    "test": {
+        "ENV": "TODO_TEST_DB_URL"
+    },
+    "production": {
+        "ENV": "TODO_PROD_DB_URL"
+    },
+    "defaultEnv": {
+        "ENV": "TODO_NODE_ENV"
+    },
+    "sql-file": true
+}

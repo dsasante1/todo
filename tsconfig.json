@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "moduleResolution": "NodeNext",
+    "noImplicitAny": true,
+    "module": "NodeNext",
+    "target": "es5",
+    "allowJs": true,
+    "strict": true,
+    "resolveJsonModule": true,
+    "typeRoots": ["./node_modules/@types", "./**/*.d.ts", "./winston-papertrail.d.ts"]
+  },
+   "ts-node": {
+    "files": true
+  },
+  "files": ["src/index.ts"],
+  "include": ["./src/**/*.ts", "tests", "./winston-papertrail.d.ts", "./request.d.ts", "./custom.d.ts"] // Add this line to include the file]
+}
