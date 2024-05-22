@@ -52,7 +52,7 @@ class AuthMiddleware {
     }
     try {
       const decoded = verifyToken(token, Env.get('TODO_SECRET'));
-      // req.data = decoded;
+      req.data = decoded;
       next();
     } catch (error) {
       return next(new ApiError(StatusCodes.UNAUTHORIZED, AUTH_REQUIRED));

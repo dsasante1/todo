@@ -6,22 +6,14 @@ import { ApiError } from '../../utils/errors';
 import Logger from '../../config/logger';
 import { ResponseMessages } from './responseMessages';
 import { UserServices } from './user.service';
-// import { FetchUsersSchema } from './validation';
+import { loginValidator } from './validation';
 
 const userServices = new UserServices();
 
-const {
-  USER_CREATED,
-  USER_UPDATED_SUCCESSFULLY,
-  USER_UPDATE_FAILURE,
-  // USERS_FETCHED,
-  EMAIL_ALREADY_EXIST,
-  INVALID_CREDENTIALS,
-  // USER_NOT_FOUND,
-} = ResponseMessages;
+const { USER_CREATED, EMAIL_ALREADY_EXIST, INVALID_CREDENTIALS } =
+  ResponseMessages;
 
-const { createUser, login, editUserProfile, retrieveUserByEmail } =
-  userServices;
+const { createUser, login, retrieveUserByEmail } = userServices;
 
 /**
  * Contains controller methods for the UserEntity
@@ -77,67 +69,10 @@ export class UserController {
     }
   }
 
-  static async editUserProfile(
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ) {
-    try {
-      const response = new ResponseHandler(req, res);
-      const {
-        id,
-        first_name,
-        last_name,
-        user_name,
-        phone_number,
-        dob,
-        gender,
-        image_url,
-        address,
-        country,
-      } = req.body;
-      const user = await editUserProfile({
-        id,
-        first_name,
-        last_name,
-        user_name,
-        phone_number,
-        dob,
-        gender,
-        image_url,
-        address,
-        country,
-      });
-      if (!user) {
-        return ApiError.appError(
-          {
-            code: StatusCodes.BAD_REQUEST,
-            message: USER_UPDATE_FAILURE,
-            details: [],
-          },
-          req,
-          res,
-          next,
-        );
-      }
-
-      return response.success({
-        message: USER_UPDATED_SUCCESSFULLY,
-        code: StatusCodes.OK,
-        data: user,
-      });
-    } catch (error) {
-      Logger.error(
-        'Error: An error occurred getting user info in UserController::editUserInfo',
-      );
-      throw error;
-    }
-  }
-
   static async login(req: Request, res: Response, next: NextFunction) {
     try {
       const response = new ResponseHandler(req, res);
-      // await loginValidator.parseAsync(req.body);
+      await loginValidator.parseAsync(req.body);
       const [result, error] = await Deasyncify.watch(login(req.body));
       const user = await retrieveUserByEmail(req.body.email);
       if (!user || !user.email) {
@@ -145,17 +80,6 @@ export class UserController {
           {
             code: StatusCodes.BAD_REQUEST,
             message: 'Email does not exist, create an account',
-          },
-          req,
-          res,
-          next,
-        );
-      }
-      if (user.status === 'disabled') {
-        return ApiError.appError(
-          {
-            code: StatusCodes.BAD_REQUEST,
-            message: 'Your account has been disabled, contact support',
           },
           req,
           res,

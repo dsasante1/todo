@@ -1,9 +1,8 @@
 import { UserEntity } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
-import { UserRepository, UpdateUserArgs } from './repositories/user.interface';
+import { UserRepository } from './repositories/user.interface';
 import * as jwt from 'jsonwebtoken';
 import UserQueries from './queries';
-import { GenericHelper } from '../../utils/helpers';
 import { UserType } from '.';
 import Env from '../../utils/env';
 import { sqlQuest } from '../../config/database';
@@ -18,14 +17,7 @@ import config from '../../config/env';
 import { ApiError } from '../../utils/errors';
 import { StatusCodes } from 'http-status-codes';
 
-const { createUser, fetchUserByEmail, updateUserProfile } = UserQueries;
-const {
-  generateAlId,
-  generateRandomCode,
-  generateRandomFourDigitNumber,
-  // paginateData,
-  // hashText,
-} = GenericHelper;
+const { createUser, fetchUserByEmail } = UserQueries;
 
 /**
  * @class UserServices
@@ -40,43 +32,22 @@ export class UserServices implements UserRepository {
    * object if the admin exists. Otherwise, it returns null.
    */
   async createUser(data: UserType): Promise<UserEntity> {
-    const id: string = generateAlId();
-
-    let referral_code;
-
-    if (data.referral_code) {
-      referral_code = data.referral_code;
-    } else {
-      referral_code = `${data.user_name.substring(
-        0,
-        3,
-      )}code${generateRandomCode(2, 5)}`;
-    }
-
     const salt = await bcrypt.genSalt(Number(Env.get('TODO_SALT_ROUNDS')));
     const hashPassword = await bcrypt.hash(data.password, salt);
-    const otp: number = generateRandomFourDigitNumber();
-    await sqlQuest.any(createUser, {
-      id,
+
+    const result = await sqlQuest.any(createUser, {
       first_name: data.first_name,
       last_name: data.last_name,
-      user_name: data.user_name,
       email: data.email,
       password: hashPassword,
-      salt,
-      country: data.country,
-      phone_number: data.phone_number,
-      referral_code,
-      user_otp: otp,
     });
 
     const token: string = jwt.sign(
       {
-        id,
+        id: result.id,
         email: data.email,
         first_name: data.first_name,
         last_name: data.last_name,
-        user_name: data.user_name,
       },
       config?.TODO_SECRET as string,
       {
@@ -86,13 +57,10 @@ export class UserServices implements UserRepository {
     );
 
     return {
-      id,
+      id: result.id,
       email: data.email,
       first_name: data.first_name,
       last_name: data.last_name,
-      user_name: data.user_name,
-      phone_number: data.phone_number,
-      referral_code,
       token,
     };
   }
@@ -144,16 +112,5 @@ export class UserServices implements UserRepository {
       );
       throw error;
     }
-  }
-
-  /**
-   * Edit user account
-   * @memberof UserServices
-   * @param {data} userData - user data to be added
-   * @returns {Promise<Object>} - Returns a promise that resolves to the user
-   * object if the admin exists. Otherwise, it returns null.
-   */
-  async editUserProfile(user: UpdateUserArgs): Promise<UserEntity> {
-    return sqlQuest.oneOrNone(updateUserProfile, user);
   }
 }

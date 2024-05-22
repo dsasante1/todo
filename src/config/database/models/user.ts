@@ -5,7 +5,6 @@ export interface UserModel {
   email: string;
   password: string;
   salt: string;
-  phone_number: string;
   created_at: Date;
   updated_at: Date;
 }
