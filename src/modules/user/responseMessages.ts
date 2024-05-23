@@ -6,7 +6,7 @@ export const ResponseMessages = {
   USERS_FETCHED: 'Users fetched successfully!',
   USERS_NOT_FOUND: 'Users Not Found',
   EMAIL_ALREADY_EXIST: 'Email already exist',
-  INVALID_CREDENTIALS: 'Incorrect login details',
+  INVALID_CREDENTIALS: 'Invalid Email or Password',
   INVALID_OTP: 'Invalid otp',
   USER_DELETED: 'Customer deleted successfully',
   USER_DELETED_FAIL: 'Could not delete customer',

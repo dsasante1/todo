@@ -68,7 +68,7 @@ export class UserController {
         return ApiError.appError(
           {
             code: StatusCodes.BAD_REQUEST,
-            message: 'Email does not exist, create an account',
+            message: INVALID_CREDENTIALS,
           },
           req,
           res,
