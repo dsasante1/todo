@@ -12,4 +12,5 @@ export const ResponseMessages = {
   USER_DELETED_FAIL: 'Could not delete customer',
   ACCOUNT_ACTIVITY: 'Account activity',
   USER_CHANGE_PASSWORD: 'Your password was successfully updated',
+  ACCOUNT_ALREADY_EXIST: 'Account already exists',
 };

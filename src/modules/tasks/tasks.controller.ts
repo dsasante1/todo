@@ -39,9 +39,10 @@ export class TasksController {
     try {
       const response = new ResponseHandler(req, res);
 
-      const { task, priority_number } = req.body;
+      const { task, priority } = req.body;
       const id = req.data.id;
-      const result: any = await createTasks({ id, task, priority_number });
+
+      const result: any = await createTasks({ id, task, priority });
 
       if (!result) {
         return ApiError.appError(
@@ -73,14 +74,14 @@ export class TasksController {
     try {
       const response = new ResponseHandler(req, res);
 
-      const { id, task, priority_number } = req.body;
+      const { id, task, priority } = req.body;
       const user_id = req.data.id;
 
       const result: any = await updateTasks({
         id,
         user_id,
         task,
-        priority_number,
+        priority,
       });
 
       if (!result) {
@@ -112,12 +113,12 @@ export class TasksController {
   static async editPriority(req: Request, res: Response, next: NextFunction) {
     try {
       const response = new ResponseHandler(req, res);
-      const { id, priority_number } = req.body;
+      const { id, priority } = req.body;
       const user_id = req.data.id;
       const task = await editTaskPriority({
         id,
         user_id,
-        priority_number,
+        priority,
       });
       if (!task) {
         return ApiError.appError(
@@ -289,15 +290,9 @@ export class TasksController {
   static async searchTask(req: Request, res: Response, next: NextFunction) {
     try {
       const response = new ResponseHandler(req, res);
-      const { id, priority_number, completed, all } = req.body;
+      const { id, priority, completed, all } = req.body;
       const user_id = req.data.id;
-      const task = await searchTasks(
-        id,
-        user_id,
-        priority_number,
-        completed,
-        all,
-      );
+      const task = await searchTasks(id, user_id, priority, completed, all);
       if (!task) {
         return ApiError.appError(
           {

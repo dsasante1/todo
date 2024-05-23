@@ -41,15 +41,15 @@ export class TasksServices {
    */
   async createTasks(data: TasksType): Promise<TasksEntity> {
     const task = await sqlQuest.any(createTask, {
-      id: data.id,
+      user_id: data.id,
       task: data.task,
-      priority_number: data.priority_number || 0,
+      priority: data.priority || 0,
     });
 
     return {
       id: task.id,
       task: task.task,
-      priority_number: task.priority_number,
+      priority: task.priority,
       completed: task.completed,
     };
   }
@@ -58,13 +58,13 @@ export class TasksServices {
     const task = await sqlQuest.any(updateTask, {
       user_id: data.id,
       task: data.task,
-      priority_number: data.priority_number,
+      priority: data.priority,
     });
 
     return {
       id: task.id,
       task: task.task,
-      priority_number: task.priority_number,
+      priority: task.priority,
       completed: task.completed,
     };
   }
@@ -83,7 +83,7 @@ export class TasksServices {
     return {
       id: task.id,
       task: task.task,
-      priority_number: task.priority_number,
+      priority: task.priority,
       completed: task.completed,
     };
   }
@@ -135,7 +135,7 @@ export class TasksServices {
   /**
    * Search tasks
    * @memberof TasksServices
-   * @param priority_number: number,
+   * @param priority: number,
    * @param completed: boolean,
    * @param all: string,
    * @returns {Promise<Object>} - Returns a promise that resolves to the task
@@ -144,7 +144,7 @@ export class TasksServices {
 
   async searchTasks(
     id: number,
-    priority_number: number,
+    priority: number,
     completed: boolean,
     all: string,
     page?: number,
@@ -152,7 +152,7 @@ export class TasksServices {
   ): Promise<any> {
     const conditions: string[] = [];
     const queryParams: {
-      priority_number?: number;
+      priority?: number;
       completed?: boolean;
       all?: string;
     } = {};
@@ -160,17 +160,15 @@ export class TasksServices {
     const currentPage: number = parseInt(page as any) || 1;
     const pageLimit: number = parseInt(limit as any) || 10;
 
-    if (priority_number) {
-      queryParams.priority_number = priority_number;
+    if (priority) {
+      queryParams.priority = priority;
       conditions.push(`
               (
-                transaction_info.transaction_type ILIKE '%' || $/priority_number/ || '%'
+                transaction_info.transaction_type ILIKE '%' || $/priority/ || '%'
               )
           `);
       Logger.info(
-        `Fetching all transactions with filter - ${JSON.stringify(
-          priority_number,
-        )}`,
+        `Fetching all transactions with filter - ${JSON.stringify(priority)}`,
       );
     }
 

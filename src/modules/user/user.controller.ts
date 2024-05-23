@@ -10,7 +10,7 @@ import { loginValidator } from './validation';
 
 const userServices = new UserServices();
 
-const { USER_CREATED, EMAIL_ALREADY_EXIST, INVALID_CREDENTIALS } =
+const { USER_CREATED, ACCOUNT_ALREADY_EXIST, INVALID_CREDENTIALS } =
   ResponseMessages;
 
 const { createUser, login, retrieveUserByEmail } = userServices;
@@ -26,25 +26,16 @@ export class UserController {
 
       const { data } = req.body;
 
+      console.log('here are errors ', data);
+
       const user = await retrieveUserByEmail(data.email);
 
       if (user) {
-        if (user.email === data.email && user.is_verified === false) {
-          return ApiError.appError(
-            {
-              code: StatusCodes.BAD_REQUEST,
-              message: 'Email already exists but has not been verified',
-            },
-            req,
-            res,
-            next,
-          );
-        }
         if (user.email === data.email) {
           return ApiError.appError(
             {
               code: StatusCodes.BAD_REQUEST,
-              message: EMAIL_ALREADY_EXIST,
+              message: ACCOUNT_ALREADY_EXIST,
             },
             req,
             res,
@@ -87,6 +78,7 @@ export class UserController {
         );
       }
       if (error) {
+        console.log('ERROR FROM CONTROLLER', error);
         return ApiError.appError(
           {
             code: StatusCodes.BAD_REQUEST,
@@ -107,6 +99,7 @@ export class UserController {
         'Error: An error occurred while logging admin in, in UserController::login',
         error,
       );
+      next(error);
       throw error;
     }
   }
