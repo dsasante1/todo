@@ -26,8 +26,6 @@ export class UserController {
 
       const { data } = req.body;
 
-      console.log('here are errors ', data);
-
       const user = await retrieveUserByEmail(data.email);
 
       if (user) {
@@ -78,7 +76,6 @@ export class UserController {
         );
       }
       if (error) {
-        console.log('ERROR FROM CONTROLLER', error);
         return ApiError.appError(
           {
             code: StatusCodes.BAD_REQUEST,

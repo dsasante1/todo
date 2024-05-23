@@ -8,7 +8,7 @@ const {
   editPriority,
   editTaskStatus,
   deleteTask,
-  fetchTask,
+  fetchTasks,
   searchTask,
   updateTask,
 } = TasksController;
@@ -21,7 +21,7 @@ Router.put('/edit', tryCatch(updateTask));
 Router.patch('/priority', tryCatch(editPriority));
 Router.patch('/status', tryCatch(editTaskStatus));
 Router.delete('/delete', tryCatch(deleteTask));
-Router.get('/get', tryCatch(fetchTask));
+Router.get('/', tryCatch(fetchTasks));
 Router.get('/search', tryCatch(searchTask));
 
 export const tasksRouter = Router;

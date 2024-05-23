@@ -1,3 +1,3 @@
-import { UserType } from './types/user.type';
+import { TasksType } from './types/tasks.type';
 
-export { UserType };
+export { TasksType };

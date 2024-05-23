@@ -14,6 +14,20 @@ const updateTask = `
     RETURNING *;
 `;
 
+const updatePriority = `
+    UPDATE tasks 
+    SET priority = $3
+    WHERE id = $1 AND user_id = $2 
+    RETURNING *;
+`;
+
+const updateTaskStatus = `
+    UPDATE tasks 
+    SET completed = $3
+    WHERE id = $1 AND user_id = $2 
+    RETURNING *;
+`;
+
 const findTaskById = `
     SELECT *
     FROM tasks 
@@ -23,7 +37,7 @@ const findTaskById = `
 const fetchTasks = `
     SELECT *
     FROM tasks
-    WHERE user_id = $1 AND user_id = $2;
+    WHERE user_id = $1;
 `;
 
 const deleteTask = `
@@ -32,7 +46,10 @@ const deleteTask = `
     RETURNING *;
 `;
 
-const searchTasks = ``;
+const searchTasks = `
+    SELECT *
+    FROM tasks
+    WHERE user_id = $1 `;
 
 const TaskQueries = {
   createTask,
@@ -41,6 +58,8 @@ const TaskQueries = {
   fetchTasks,
   deleteTask,
   searchTasks,
+  updatePriority,
+  updateTaskStatus,
 };
 
 export default TaskQueries;

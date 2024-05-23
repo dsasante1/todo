@@ -5,30 +5,35 @@ export type TasksType = {
 };
 
 export type UpdateTasksType = {
-  id: string;
+  id: number;
   user_id: string;
   task: string;
   priority?: number;
 };
 
 export type EditTaskPriority = {
-  id: string;
+  id: number;
   user_id: string;
-  priority: string;
+  priority: number;
 };
 
 export type EditTaskStatus = {
-  id: string;
+  id: number;
   user_id: string;
-  task_status: string;
+  task_status: boolean;
 };
 
 export type FetchTask = {
-  id: string;
+  id?: number;
   user_id: string;
 };
 
 export type DeleteTask = {
-  id: string;
+  id: number;
+  user_id: string;
+};
+
+export type SearchTask = {
+  id: number;
   user_id: string;
 };

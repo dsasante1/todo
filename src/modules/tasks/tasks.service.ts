@@ -1,6 +1,5 @@
 import { TasksEntity } from './entities/tasks.entity';
 import TasksQueries from './queries';
-import { GenericHelper } from '../../utils/helpers';
 import {
   TasksType,
   EditTaskPriority,
@@ -21,11 +20,9 @@ const {
   fetchTasks,
   searchTasks,
   deleteTask,
+  updatePriority,
+  updateTaskStatus,
 } = TasksQueries;
-const {
-  paginateData,
-  // hashText,
-} = GenericHelper;
 
 /**
  * @class TasksServices
@@ -55,11 +52,12 @@ export class TasksServices {
   }
 
   async updateTasks(data: UpdateTasksType): Promise<TasksEntity> {
-    const task = await sqlQuest.any(updateTask, {
-      user_id: data.id,
-      task: data.task,
-      priority: data.priority,
-    });
+    const task = await sqlQuest.oneOrNone(updateTask, [
+      data.id,
+      data.user_id,
+      data.task,
+      data.priority,
+    ]);
 
     return {
       id: task.id,
@@ -96,7 +94,11 @@ export class TasksServices {
    * object if the admin exists. Otherwise, it returns null.
    */
   async editTaskPriority(task: EditTaskPriority): Promise<TasksEntity> {
-    return sqlQuest.oneOrNone(updateTask, task);
+    return sqlQuest.oneOrNone(updatePriority, [
+      task.id,
+      task.user_id,
+      task.priority,
+    ]);
   }
 
   /**
@@ -107,7 +109,22 @@ export class TasksServices {
    * object if the admin exists. Otherwise, it returns null.
    */
   async toggleTaskCompletion(task: EditTaskStatus): Promise<TasksEntity> {
-    return sqlQuest.oneOrNone(updateTask, task);
+    return sqlQuest.oneOrNone(updateTaskStatus, [
+      task.id,
+      task.user_id,
+      task.task_status,
+    ]);
+  }
+
+  /**
+   * Fetch task
+   * @memberof TasksServices
+   * @param {data} taskData - task data to be added
+   * @returns {Promise<Object>} - Returns a promise that resolves to the task
+   * object if the admin exists. Otherwise, it returns null.
+   */
+  async fetchTask(task: FetchTask): Promise<TasksEntity> {
+    return sqlQuest.oneOrNone(findTaskById, [task.id, task.user_id]);
   }
 
   /**
@@ -117,8 +134,8 @@ export class TasksServices {
    * @returns {Promise<Object>} - Returns a promise that resolves to the task
    * object if the admin exists. Otherwise, it returns null.
    */
-  async fetchTask(task: FetchTask): Promise<TasksEntity> {
-    return sqlQuest.oneOrNone(fetchTasks, task);
+  async fetchTasks(task: FetchTask): Promise<TasksEntity> {
+    return sqlQuest.manyOrNone(fetchTasks, [task.user_id]);
   }
 
   /**
@@ -129,7 +146,7 @@ export class TasksServices {
    * object if the admin exists. Otherwise, it returns null.
    */
   async deleteTask(task: DeleteTask): Promise<TasksEntity> {
-    return sqlQuest.oneOrNone(deleteTask, task);
+    return sqlQuest.oneOrNone(deleteTask, [task.id, task.user_id]);
   }
 
   /**
@@ -143,62 +160,47 @@ export class TasksServices {
    */
 
   async searchTasks(
-    id: number,
-    priority: number,
-    completed: boolean,
-    all: string,
-    page?: number,
-    limit?: number,
+    user_id?: number,
+    priority?: number,
+    completed?: boolean,
   ): Promise<any> {
-    const conditions: string[] = [];
-    const queryParams: {
-      priority?: number;
-      completed?: boolean;
-      all?: string;
-    } = {};
-
-    const currentPage: number = parseInt(page as any) || 1;
-    const pageLimit: number = parseInt(limit as any) || 10;
+    // const conditions: string[] = [];
+    // const queryParams: {
+    //   priority?: number;
+    //   completed?: boolean;
+    //   all?: string;
+    // } = {};
 
     if (priority) {
-      queryParams.priority = priority;
-      conditions.push(`
-              (
-                transaction_info.transaction_type ILIKE '%' || $/priority/ || '%'
-              )
-          `);
+      const priorityQuery = `SELECT *
+      FROM tasks
+      WHERE user_id = $1 AND priority = $2`;
       Logger.info(
-        `Fetching all transactions with filter - ${JSON.stringify(priority)}`,
+        `Fetching all tasks with filter - ${JSON.stringify(priority)}`,
       );
+      return sqlQuest.manyOrNone(priorityQuery, [user_id, priority]);
+    } else if (completed) {
+      const completedQuery = `SELECT *
+      FROM tasks
+      WHERE user_id = $1 AND completed = $2`;
+      Logger.info(
+        `Fetching all tasks with filter - ${JSON.stringify(completed)}`,
+      );
+      return sqlQuest.manyOrNone(completedQuery, [user_id, completed]);
+    } else if (completed && priority) {
+      const completedQuery = `SELECT *
+      FROM tasks
+      WHERE user_id = $1 AND completed = $2 AND priority = $3`;
+      Logger.info(
+        `Fetching all tasks with filter - ${JSON.stringify(completed)}`,
+      );
+      return sqlQuest.manyOrNone(completedQuery, [
+        user_id,
+        completed,
+        priority,
+      ]);
+    } else {
+      return sqlQuest.manyOrNone(searchTasks, [user_id]);
     }
-
-    if (completed) {
-      queryParams.completed = completed;
-      conditions.push(`
-              (
-                transaction_info.completed::text ILIKE '%' || $/completed/ || '%'
-              )
-          `);
-    }
-    if (all) {
-      queryParams.all = all;
-      conditions.push(`
-              (
-                transaction_info.user_id = $/all/
-              )
-          `);
-    }
-
-    const whereClause =
-      conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
-    const findTransactionsQuery = `${searchTasks} ${whereClause} ORDER BY transaction_info.created_at DESC`;
-    const transactions = await paginateData(
-      findTransactionsQuery,
-      queryParams,
-      currentPage,
-      pageLimit,
-    );
-    Logger.info(`Transactions fetched ${JSON.stringify(transactions)}`);
-    return transactions;
   }
 }

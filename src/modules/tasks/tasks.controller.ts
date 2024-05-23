@@ -24,6 +24,7 @@ const {
   createTasks,
   editTaskPriority,
   toggleTaskCompletion,
+  fetchTasks,
   fetchTask,
   deleteTask,
   searchTasks,
@@ -212,7 +213,7 @@ export class TasksController {
       });
     } catch (error) {
       Logger.error(
-        'Error: An error occurred changing task status in UserController::editTaskpriority',
+        'Error: An error occurred changing task status in UserController::editTaskStatus',
       );
       throw error;
     }
@@ -287,12 +288,52 @@ export class TasksController {
       throw error;
     }
   }
+
+  static async fetchTasks(req: Request, res: Response, next: NextFunction) {
+    try {
+      const response = new ResponseHandler(req, res);
+      const { id } = req.body;
+      const user_id = req.data.id;
+      const task = await fetchTasks({
+        id,
+        user_id,
+      });
+      if (!task) {
+        return ApiError.appError(
+          {
+            code: StatusCodes.BAD_REQUEST,
+            message: TASKS_NOT_FOUND,
+            details: [],
+          },
+          req,
+          res,
+          next,
+        );
+      }
+
+      return response.success({
+        message: TASKS_FETCHED,
+        code: StatusCodes.OK,
+        data: task,
+      });
+    } catch (error) {
+      Logger.error(
+        'Error: An error occurred fetching task in UserController::fetchTask',
+      );
+      throw error;
+    }
+  }
   static async searchTask(req: Request, res: Response, next: NextFunction) {
     try {
       const response = new ResponseHandler(req, res);
-      const { id, priority, completed, all } = req.body;
+
+      const { priority, completed } = req.query as unknown as {
+        priority: number;
+        completed: boolean;
+        all: string;
+      };
       const user_id = req.data.id;
-      const task = await searchTasks(id, user_id, priority, completed, all);
+      const task = await searchTasks(user_id, priority, completed);
       if (!task) {
         return ApiError.appError(
           {
