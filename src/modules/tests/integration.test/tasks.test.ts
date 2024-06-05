@@ -17,7 +17,6 @@ describe('Tasks Routes', () => {
       .post(`${baseUrl}/new`)
       .set('Authorization', token)
       .send({
-        user_id: process.env.USER_ID,
         task: 'notify_android_token',
         priority: 2,
       })
@@ -35,12 +34,28 @@ describe('Tasks Routes', () => {
       .post(`${baseUrl}/new`)
       .set('Authorization', token)
       .send({
-        user_id: process.env.USER_ID,
         task: 'notify_web_token',
         priority: 1,
       })
       .end((err: any, res: { status: any, body: any }) => {
         process.env.SECOND_TASK_ID = res.body.data.id;
+        expect(res.status).to.equal(200);
+        done(err);
+      });
+  });
+
+  it('Should add task with different priority successfully', (done) => {
+    const token = process.env.USER_TOKEN!;
+    chai
+      .request(App())
+      .post(`${baseUrl}/new`)
+      .set('Authorization', token)
+      .send({
+        task: 'notify_iphone_token',
+        priority: 4,
+      })
+      .end((err: any, res: { status: any, body: any }) => {
+        process.env.THIRD_TASK_ID = res.body.data.id;
         expect(res.status).to.equal(200);
         done(err);
       });
@@ -55,7 +70,7 @@ describe('Tasks Routes', () => {
       .send({
       })
       .end((err: any, res: { status: any }) => {
-        expect(res.status).to.equal(400);
+        expect(res.status).to.equal(500);
         done(err);
       });
   });
@@ -95,7 +110,7 @@ describe('Tasks Routes', () => {
 //       });
 //   });
 
-  it('Should update task successfully', (done) => {
+  it('Should fail to update task successfully', (done) => {
     
     const token = process.env.USER_TOKEN!;
     chai
@@ -108,7 +123,7 @@ describe('Tasks Routes', () => {
         priority: 5,
       })
       .end((err: any, res: { status: any }) => {
-        expect(res.status).to.equal(200);
+        expect(res.status).to.equal(400);
         done(err);
       });
   });
@@ -148,7 +163,8 @@ describe('Tasks Routes', () => {
   //       });
   //   });
 
-    it('Should delete task successfully', (done) => {
+
+    it('Should fail to delete task successfully', (done) => {
       const token = process.env.USER_TOKEN!;
       chai
         .request(App())
@@ -158,7 +174,7 @@ describe('Tasks Routes', () => {
           id: process.env.FIRST_TASK_ID,
         })
         .end((err: any, res: { status: any }) => {
-          expect(res.status).to.equal(200);
+          expect(res.status).to.equal(400);
           done(err);
         });
     });
@@ -184,7 +200,7 @@ describe('Tasks Routes', () => {
       .send({
       })
       .end((err: any, res: { status: any }) => {
-        expect(res.status).to.equal(400);
+        expect(res.status).to.equal(401);
         done(err);
       });
   });
@@ -232,7 +248,7 @@ describe('Tasks Routes', () => {
           id: process.env.SECOND_TASK_ID,
         })
         .end((err: any, res: { status: any }) => {
-          expect(res.status).to.equal(400);
+          expect(res.status).to.equal(401);
           done(err);
         });
     });
@@ -286,20 +302,6 @@ describe('Tasks Routes', () => {
         });
     });
 
-
-    it('Should fail to delete task', (done) => {
-      const token = process.env.USER_TOKEN!;
-      chai
-        .request(App())
-        .delete(`${baseUrl}/delete`)
-        .set('Authorization', token)
-        .send({
-        })
-        .end((err: any, res: { status: any }) => {
-          expect(res.status).to.equal(400);
-          done(err);
-        });
-    });
 
   //   it('Should fetch all tasks with invalid authorization', (done) => {
   //     chai

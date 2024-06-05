@@ -56,11 +56,11 @@ export class TasksController {
           next,
         );
       }
-
+      const [responseData] = result;
       return response.success({
         message: TASK_CREATED,
         code: StatusCodes.OK,
-        data: result,
+        data: responseData,
       });
     } catch (error) {
       Logger.error(
@@ -103,6 +103,7 @@ export class TasksController {
         data: result,
       });
     } catch (error) {
+      console.log(error);
       Logger.error(
         'Error: An error occurred while updating a task in TasksController::updateTask',
         error,

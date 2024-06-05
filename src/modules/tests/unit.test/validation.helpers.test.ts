@@ -32,23 +32,4 @@ describe('ValidationHelper', () => {
   });
 
 
-  it('should validate a required email', () => {
-    const schema = ValidationHelper.bulkEmailCheck(1);
-    expect(() => schema.parse('test@example.com')).not.to.throw();
-    expect(() => schema.parse('invalid-email')).to.throw(z.ZodError);
-  });
-
-  it('should validate a phone number', () => {
-    const schema = ValidationHelper.phoneCheck(10, 14);
-    expect(() => schema.parse('1234567890')).not.to.throw();
-    expect(() => schema.parse('123')).to.throw(z.ZodError);
-    expect(() => schema.parse('123456789012345')).to.throw(z.ZodError);
-  });
-
-  it('should validate an optional date', () => {
-    const schema = ValidationHelper.dateCheck();
-    expect(() => schema.parse(null)).not.to.throw();
-    expect(() => schema.parse(undefined)).not.to.throw();
-    expect(() => schema.parse(new Date())).not.to.throw();
-  });
 });

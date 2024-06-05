@@ -20,6 +20,7 @@ describe('User Routes', () => {
           password: 'Test1@F007',
         },
       });
+
     process.env.USER_EMAIL = result.body.data.email;
     process.env.USER_TOKEN = result.body.data.token;
     process.env.USER_ID = result.body.data.id;

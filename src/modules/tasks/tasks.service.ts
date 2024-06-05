@@ -43,12 +43,7 @@ export class TasksServices {
       priority: data.priority || 0,
     });
 
-    return {
-      id: task.id,
-      task: task.task,
-      priority: task.priority,
-      completed: task.completed,
-    };
+    return task;
   }
 
   async updateTasks(data: UpdateTasksType): Promise<TasksEntity> {
@@ -59,12 +54,7 @@ export class TasksServices {
       data.priority,
     ]);
 
-    return {
-      id: task.id,
-      task: task.task,
-      priority: task.priority,
-      completed: task.completed,
-    };
+    return task;
   }
   /**
    * find task by id
